@@ -1,0 +1,12 @@
+<ion-view view-title="Employees">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="employee in employees" class="item-avatar item-icon-right" item-icon-right href="#/app/employee/{{employee.id}}">
+      	<img ng-src="img/pics/{{employee.pic}}">
+        <h2>{{employee.firstName}} {{employee.lastName}}</h2>
+      	<p>{{employee.title}}</p>
+        <i class="icon ion-chevron-right"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

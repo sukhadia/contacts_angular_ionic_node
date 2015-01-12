@@ -1,0 +1,66 @@
+<ion-view view-title="Employee">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-avatar item-icon-right">
+      	<!-- Name and Title -->
+      	<img id="emp-pic-{{employee.id}}" ng-src="img/pics/{{employee.pic}}">
+        <h2>{{employee.firstName}} {{employee.lastName}}</h2>
+      	<p>{{employee.title}}</p>
+      </ion-item>
+      <!-- Office Phone -->
+      <ion-item href="tel:{{ employee.officePhone }}" class="item-icon-left item-icon-right">
+      	<i class="icon ion-ios7-telephone-outline"></i>
+        Call Office
+      	<span class="item-note">
+	      {{ employee.officePhone }}
+	    </span>
+	    <i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- Cell Phone -->
+      <ion-item href="tel:{{ employee.cellPhone }}" class="item-icon-left item-icon-right">
+      	<i class="icon ion-ios7-telephone-outline"></i>
+        Call Cell
+      	<span class="item-note">
+	      {{ employee.cellPhone }}
+	    </span>
+	    <i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- SMS -->
+      <ion-item href="sms:{{ employee.cellPhone }}" class="item-icon-left item-icon-right">
+      	<i class="icon icon ion-chatbubble-working"></i>
+        SMS
+      	<span class="item-note">
+	      {{ employee.cellPhone }}
+	    </span>
+	    <i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- E-Mail -->
+      <ion-item href="mailto:{{ employee.email }}" class="item-icon-left item-icon-right">
+      	<i class="icon icon ion-email"></i>
+        E-Mail
+      	<span class="item-note">
+	      {{ employee.email }}
+	    </span>
+	    <i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- Show Location -->
+      <ion-item ng-click="showLocation($event)" class="item-icon-left item-icon-right">
+      	<i class="icon icon ion-pinpoint"></i>
+        Pinpoint Location
+      	<i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- Add Contact -->
+      <ion-item contacts ng-model='employee' class="item-icon-left item-icon-right">
+      	<i class="icon ion-person-add"></i>
+        Add Contact
+      	<i class="icon ion-chevron-right"></i>
+      </ion-item>
+      <!-- Change Picture -->
+      <ion-item camera ng-model='employee' class="item-icon-left item-icon-right">
+      	<i class="icon ion-camera"></i>
+        Change Picture
+      	<i class="icon ion-chevron-right"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

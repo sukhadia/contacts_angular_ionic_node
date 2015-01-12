@@ -1,0 +1,26 @@
+<ion-view view-title="Employee Search">
+  <ion-content>
+  	<!-- Version that uses the ION search widget. UX not good with current design (since widget and results 
+  	are on separate screens) -->
+  	<!-- <div class="list list-inset">
+		<label class="item item-input">
+	      <i class="icon ion-search placeholder-icon"></i>
+	      <input type="text" placeholder="Search" ng-model="searchString"> 
+	    </label>
+	    <button class="button button-small" ng-click="doSearch(searchString)"> 
+	      Submit
+	    </button>
+	</div> -->
+	<div class="list">
+	  <div class="item item-input-inset">
+	    <label class="item-input-wrapper">
+	      <i class="icon ion-search placeholder-icon"></i>
+	      <input type="text" placeholder="Search" ng-model="searchString">
+	    </label>
+	    <button class="button button-small" ng-click="doSearch(searchString)">
+	      GO
+	    </button>
+	  </div>
+	</div>
+  </ion-content>
+</ion-view>
