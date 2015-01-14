@@ -8,11 +8,9 @@
       Ionic Framework Team
     </author>
   <content src="index.html"/>
-  <!-- Following 3 lines are important. The SMS/Phone/Email links don't work without these! -->
   <access origin="sms:*" launch-external="yes"/>
   <access origin="tel:*" launch-external="yes"/>
   <access origin="mailto:*" launch-external="yes"/>
-
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>

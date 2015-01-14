@@ -1,6 +1,10 @@
 <ion-view view-title="Employees">
   <ion-content>
-    <ion-list>
+    <ion-refresher
+      pulling-text="Pull to refresh..."
+      on-refresh="doRefresh()">
+    </ion-refresher>
+    <ion-list ng-show="employees">
       <ion-item ng-repeat="employee in employees" class="item-avatar item-icon-right" item-icon-right href="#/app/employee/{{employee.id}}">
       	<img ng-src="img/pics/{{employee.pic}}">
         <h2>{{employee.firstName}} {{employee.lastName}}</h2>
@@ -8,5 +12,8 @@
         <i class="icon ion-chevron-right"></i>
       </ion-item>
     </ion-list>
+    <h4 ng-show="!employees || !employees.length">
+      No matches found!
+    </h4>
   </ion-content>
 </ion-view>

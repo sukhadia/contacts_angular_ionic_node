@@ -58,6 +58,16 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         controller: 'EmployeeCtrl'
       }
     }
+  })
+
+  .state('app.addEmployee', {
+    url: "/addEmployee",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/addEmployee.html",
+        controller: 'AddEmployeeCtrl'
+      }
+    }
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/search');
