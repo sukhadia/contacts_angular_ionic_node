@@ -3,7 +3,7 @@
     <ion-list>
       <ion-item class="item-avatar item-icon-right">
       	<!-- Name and Title -->
-      	<img id="emp-pic-{{employee.id}}" ng-src="img/pics/{{employee.pic}}">
+      	<img id="emp-pic-{{employee.id}}" data-ng-src="{{employee.pic}}">
         <h2>{{employee.firstName}} {{employee.lastName}}</h2>
       	<p>{{employee.title}}</p>
       </ion-item>
@@ -50,13 +50,13 @@
       	<i class="icon ion-chevron-right"></i>
       </ion-item>
       <!-- Add Contact -->
-      <ion-item contacts ng-model='employee' class="item-icon-left item-icon-right">
+      <ion-item ng-click='addToContacts(employee)'  class="item-icon-left item-icon-right">
       	<i class="icon ion-person-add"></i>
         Add Contact
       	<i class="icon ion-chevron-right"></i>
       </ion-item>
       <!-- Change Picture -->
-      <ion-item camera ng-model='employee' class="item-icon-left item-icon-right">
+      <ion-item ng-click='changePic(employee)' class="item-icon-left item-icon-right">
       	<i class="icon ion-camera"></i>
         Change Picture
       	<i class="icon ion-chevron-right"></i>

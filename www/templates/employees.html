@@ -6,7 +6,7 @@
     </ion-refresher>
     <ion-list ng-show="employees">
       <ion-item ng-repeat="employee in employees" class="item-avatar item-icon-right" item-icon-right href="#/app/employee/{{employee.id}}">
-      	<img ng-src="img/pics/{{employee.pic}}">
+      	<img ng-src="{{employee.pic}}">
         <h2>{{employee.firstName}} {{employee.lastName}}</h2>
       	<p>{{employee.title}}</p>
         <i class="icon ion-chevron-right"></i>
