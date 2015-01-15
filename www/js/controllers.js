@@ -22,10 +22,14 @@ angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
   
 })
 
-.controller('EmployeeCtrl', ['$scope', '$state', '$stateParams', '$ionicLoading', '$ionicViewService', 'PopupManager', 'EmployeeService', 'NativeDelegate', function($scope, $state, $stateParams, $ionicLoading, $ionicViewService, popupManager, service, nativeDelegate) {
-  service.findById(parseInt($stateParams.employeeId, 10)).then(function (employee) {
-    $scope.employee = employee;
-  });
+.controller('EmployeeCtrl', ['$scope', '$state', '$stateParams', '$ionicLoading', '$ionicHistory', 'PopupManager', 'EmployeeService', 'NativeDelegate', function($scope, $state, $stateParams, $ionicLoading, $ionicHistory, popupManager, service, nativeDelegate) {
+  $scope.doRefresh = function() {
+    service.findById(parseInt($stateParams.employeeId, 10)).then(function (employee) {
+      $scope.employee = employee;
+      $scope.$broadcast('scroll.refreshComplete');
+    });
+  }
+  $scope.doRefresh();
 
   $scope.showLocation = function(event) {
       event.preventDefault();
@@ -102,7 +106,7 @@ angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
   $scope.deleteEmployee = function(employee) {
     service.deleteEmployee(employee).then(function() {
       popupManager.alert("Deleted Employee").then(function() {
-          $ionicViewService.clearHistory();
+          $ionicHistory.clearHistory();
           $state.go('app.search');
       });
     }, function() {
@@ -114,35 +118,33 @@ angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
 
 .controller('MenuCtrl', ['$scope', '$state', 'PopupManager', 'EmployeeService', function($scope, $state, popupManager, service, $ionicPopup) {
   $scope.addContact = function() {
-      if (!navigator.contacts) {
-        popupManager.errorAlert("Contacts API not supported");
-        return;
-      }
-      navigator.contacts.pickContact(function(contact){
-        var cellPhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'mobile'}) : [],
-          officePhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'work'}) : [],
-          employee = {
-            firstName: contact.name.givenName,
-            lastName: contact.name.familyName,
-            cellPhone: cellPhones && cellPhones[0] && cellPhones[0].value,
-            officePhone: officePhones && officePhones[0] && officePhones[0].value,
-            email: contact.emails && contact.emails[0] && contact.emails[0].value
-          };
+    if (!navigator.contacts) {
+      popupManager.errorAlert("Contacts API not supported");
+      return;
+    }
+    navigator.contacts.pickContact(function(contact){
+      var cellPhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'mobile'}) : [],
+        officePhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'work'}) : [],
+        employee = {
+          firstName: contact.name.givenName,
+          lastName: contact.name.familyName,
+          cellPhone: cellPhones && cellPhones[0] && cellPhones[0].value,
+          officePhone: officePhones && officePhones[0] && officePhones[0].value,
+          email: contact.emails && contact.emails[0] && contact.emails[0].value
+        };
 
-        popupManager.alert("You selected to add: " + JSON.stringify(employee)).then(function() {
-          service.addEmployee(employee).then(function(employee) {
-              if (employee) {
-                popupManager.alert("Done adding employee, navigating to their employee page...").then(function() {
-                    $state.go('app.single', {employeeId: employee.id});
-                });
-              }
-          }, function() {
-            popupManager.errorAlert("Couldn't add contact.");
-          });
+      popupManager.alert("You selected to add: " + angular.toJson(employee)).then(function() {
+        service.addEmployee(employee).then(function(employee) {
+            if (employee) {
+              popupManager.alert("Done adding employee, navigating to their employee page...").then(function() {
+                  $state.go('app.single', {employeeId: employee.id});
+              });
+            }
+        }, function() {
+          popupManager.errorAlert("Couldn't add contact.");
         });
-        
-
       });
+    });
   };
 
 }]);
