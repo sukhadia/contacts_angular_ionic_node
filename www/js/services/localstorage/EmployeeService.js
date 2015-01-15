@@ -1,4 +1,4 @@
-var EmployeeService = function () {
+var EmployeeService = function ( {
 
     this.initialize = function() {
         var deferred = $.Deferred(),

@@ -26,7 +26,7 @@
 	    <i class="icon ion-chevron-right"></i>
       </ion-item>
       <!-- SMS -->
-      <ion-item href="sms:{{ employee.cellPhone }}" class="item-icon-left item-icon-right">
+      <ion-item href="sms:+{{ employee.cellPhone }}" class="item-icon-left item-icon-right">
       	<i class="icon icon ion-chatbubble-working"></i>
         SMS
       	<span class="item-note">
@@ -62,5 +62,8 @@
       	<i class="icon ion-chevron-right"></i>
       </ion-item>
     </ion-list>
+    <button class="button button-block button-assertive" ng-click="deleteEmployee(employee)">
+      Delete
+    </button>
   </ion-content>
 </ion-view>

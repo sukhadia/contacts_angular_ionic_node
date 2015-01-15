@@ -1,4 +1,4 @@
-angular.module('starter.controllers', ['ionic', 'services'])
+angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 })
@@ -22,7 +22,7 @@ angular.module('starter.controllers', ['ionic', 'services'])
   
 })
 
-.controller('EmployeeCtrl', ['$scope', '$stateParams', '$ionicLoading', 'EmployeeService', function($scope, $stateParams, $ionicLoading, service) {
+.controller('EmployeeCtrl', ['$scope', '$state', '$stateParams', '$ionicLoading', '$ionicViewService', 'PopupManager', 'EmployeeService', 'NativeDelegate', function($scope, $state, $stateParams, $ionicLoading, $ionicViewService, popupManager, service, nativeDelegate) {
   service.findById(parseInt($stateParams.employeeId, 10)).then(function (employee) {
     $scope.employee = employee;
   });
@@ -32,14 +32,14 @@ angular.module('starter.controllers', ['ionic', 'services'])
       $ionicLoading.show({
         template: 'Loading...'
       });
-      navigator.geolocation.getCurrentPosition(
+      nativeDelegate.getCurrentPosition(
           function(position) {
             $ionicLoading.hide();
-            alert(position.coords.latitude + ',' + position.coords.longitude);
+            popupManager.alert(position.coords.latitude + ',' + position.coords.longitude, 'Your GPS co-ordinates');
           },
           function() {
-             $ionicLoading.hide();
-            alert('Error getting location');
+            $ionicLoading.hide();
+            popupManager.errorAlert('Couldn\'t determine location');
           },
           {timeout: 10000}
       );
@@ -52,7 +52,7 @@ angular.module('starter.controllers', ['ionic', 'services'])
 
   $scope.changePic = function(employee) {
       if (!navigator.camera) {
-          alert("Camera API not supported", "Error");
+          popupManager.errorAlert('Camera API not supported');
           return;
       }
       var options =   {   
@@ -67,18 +67,21 @@ angular.module('starter.controllers', ['ionic', 'services'])
       navigator.camera.getPicture(function (imgData) {
          $scope.$apply(function() {
             employee.pic = "data:image/jpeg;base64,"+imgData;
-            console.log('****************EMPLOYEE PIC:\n\n\n' + employee.pic);
          });
-      }, function (err) {
-         if (!(window.cordova || window.Cordova)) {
-          alert('Error taking picture', 'Error');
+      }, 
+      //Don't really need the following function, it's still here to show how we can access
+      //a method within the same scope (isWithinApp).
+      function (err) {
+         if (!$scope.isWithinApp()) {
+          popupManager.errorAlert('Error taking picture');
          }
-      }, options);
+      }, 
+      options);
   };
 
   $scope.addToContacts = function(employee) {
     if (!navigator.contacts) {
-        alert("Contacts API not supported", "Error");
+        popupManager.errorAlert("Contacts API not supported");
         return;
     }
 
@@ -93,20 +96,31 @@ angular.module('starter.controllers', ['ionic', 'services'])
         phoneNumbers: phoneNumbers
       });
     contact.save();
-    alert('Contact Saved!');
+    popupManager.alert('Contact Saved!');
+  };
+
+  $scope.deleteEmployee = function(employee) {
+    service.deleteEmployee(employee).then(function() {
+      popupManager.alert("Deleted Employee").then(function() {
+          $ionicViewService.clearHistory();
+          $state.go('app.search');
+      });
+    }, function() {
+      popupManager.errorAlert("Couldn't add contact.");
+    });
   };
 
 }])
 
-.controller('MenuCtrl', ['$scope', '$state', 'EmployeeService', function($scope, $state, service) {
+.controller('MenuCtrl', ['$scope', '$state', 'PopupManager', 'EmployeeService', function($scope, $state, popupManager, service, $ionicPopup) {
   $scope.addContact = function() {
       if (!navigator.contacts) {
-        alert("Contacts API not supported", "Error");
+        popupManager.errorAlert("Contacts API not supported");
         return;
       }
       navigator.contacts.pickContact(function(contact){
-        var cellPhones = contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'mobile'}),
-          officePhones = contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'work'}),
+        var cellPhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'mobile'}) : [],
+          officePhones = (contact.phoneNumbers)? contact.phoneNumbers.filter(function(phoneNumber) {return phoneNumber.type === 'work'}) : [],
           employee = {
             firstName: contact.name.givenName,
             lastName: contact.name.familyName,
@@ -115,18 +129,19 @@ angular.module('starter.controllers', ['ionic', 'services'])
             email: contact.emails && contact.emails[0] && contact.emails[0].value
           };
 
-        alert("You selected to add: " + JSON.stringify(employee));
-        service.addEmployee(employee).then(function(employee) {
-          if (employee) {
-            alert("Done adding employee, navigating to their employee page...");
-            $state.go('app.single', {employeeId: employee.id});
-          }
-        }, function() {
-          alert("Couldn't add contact.")
+        popupManager.alert("You selected to add: " + JSON.stringify(employee)).then(function() {
+          service.addEmployee(employee).then(function(employee) {
+              if (employee) {
+                popupManager.alert("Done adding employee, navigating to their employee page...").then(function() {
+                    $state.go('app.single', {employeeId: employee.id});
+                });
+              }
+          }, function() {
+            popupManager.errorAlert("Couldn't add contact.");
+          });
         });
+        
 
-      },function(err){
-        console.log('Error: ' + err);
       });
   };
 

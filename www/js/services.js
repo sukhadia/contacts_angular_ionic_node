@@ -1,13 +1,20 @@
 var services = angular.module('services', []);
 
-services.factory('EmployeeService', function($q) {
-	var instance = {},
-		//Is there best practicess for localStorage (or sessionStorage) at PointSource?
-		employees = window.localStorage.getItem("employees");
-    if (!employees) {
+services.factory('EmployeeDb', function($q) {
+	//Is there best practicess for localStorage (or sessionStorage) at PointSource?
+	var instance = {};
+	instance.employeeDbFromStorage = function() {
+		return angular.fromJson(window.localStorage.getItem("employeeDb"))
+	};
+	instance.employeeDbToStorage = function(object) {
+		window.localStorage.setItem("employeeDb", object.employees && angular.toJson(object) || angular.toJson({employees: object, unusedIDs: (instance.employeeDbFromStorage().unusedIDs || [])}));
+		alert('employeeDb = ' + this.employeeDbFromStorage());
+	};
+	var employeeDb = instance.employeeDbFromStorage();
+	if (!employeeDb) {
         // Store sample data in Local Storage
-        window.localStorage.setItem("employees", JSON.stringify(
-            [
+        instance.employeeDbToStorage({
+       		employees: [
                 {"id": 1, "firstName": "James", "lastName": "King", "managerId": 0, "managerName": "", "title": "President and CEO", "department": "Corporate", "cellPhone": "617-000-0001", "officePhone": "781-000-0001", "email": "jking@fakemail.com", "city": "Boston, MA", "pic": "img/pics/James_King.jpg", "twitterId": "@fakejking", "blog": "http://coenraets.org"},
                 {"id": 2, "firstName": "Julie", "lastName": "Taylor", "managerId": 1, "managerName": "James King", "title": "VP of Marketing", "department": "Marketing", "cellPhone": "617-000-0002", "officePhone": "781-000-0002", "email": "jtaylor@fakemail.com", "city": "Boston, MA", "pic": "img/pics/Julie_Taylor.jpg", "twitterId": "@fakejtaylor", "blog": "http://coenraets.org"},
                 {"id": 3, "firstName": "Eugene", "lastName": "Lee", "managerId": 1, "managerName": "James King", "title": "CFO", "department": "Accounting", "cellPhone": "617-000-0003", "officePhone": "781-000-0003", "email": "elee@fakemail.com", "city": "Boston, MA", "pic": "img/pics/Eugene_Lee.jpg", "twitterId": "@fakeelee", "blog": "http://coenraets.org"},
@@ -20,13 +27,19 @@ services.factory('EmployeeService', function($q) {
                 {"id": 10, "firstName": "Kathleen", "lastName": "Byrne", "managerId": 5, "managerName": "Ray Moore", "title": "Sales Representative", "department": "Sales", "cellPhone": "617-000-0010", "officePhone": "781-000-0010", "email": "kbyrne@fakemail.com", "city": "Boston, MA", "pic": "img/pics/Kathleen_Byrne.jpg", "twitterId": "@fakekbyrne", "blog": "http://coenraets.org"},
                 {"id": 11, "firstName": "Amy", "lastName": "Jones", "managerId": 5, "managerName": "Ray Moore", "title": "Sales Representative", "department": "Sales", "cellPhone": "617-000-0011", "officePhone": "781-000-0011", "email": "ajones@fakemail.com", "city": "Boston, MA", "pic": "img/pics/Amy_Jones.jpg", "twitterId": "@fakeajones", "blog": "http://coenraets.org"},
                 {"id": 12, "firstName": "Steven", "lastName": "Wells", "managerId": 4, "managerName": "John Williams", "title": "Software Architect", "department": "Engineering", "cellPhone": "617-000-0012", "officePhone": "781-000-0012", "email": "swells@fakemail.com", "city": "Boston, MA", "pic": "img/pics/Steven_Wells.jpg", "twitterId": "@fakeswells", "blog": "http://coenraets.org"}
-            ]
-        ));
+            ],
+            unusedIDs: []
+        });
     }
+    return instance;
+});
+
+services.factory('EmployeeService', ['EmployeeDb', '$q', function(db, $q) {
+	var instance = {};
 
     instance.findById = function (id) {
         return $q(function(resolve, reject) {
-	        var	employees = JSON.parse(window.localStorage.getItem("employees")),
+	        var	employees = db.employeeDbFromStorage().employees
 	            employee = null,
 	            l = employees.length;
 
@@ -44,8 +57,9 @@ services.factory('EmployeeService', function($q) {
 
     instance.findByName = function (searchKey) {
     	return $q(function(resolve, reject) {
-	        var employees = JSON.parse(window.localStorage.getItem("employees")),
-	            results = employees.filter(function (element) {
+	        var employees = db.employeeDbFromStorage().employees;
+	        alert(db.employeeDbFromStorage());
+	        var results = employees.filter(function (element) {
 	                var fullName = element.firstName + " " + element.lastName;
 	                return fullName.toLowerCase().indexOf(searchKey.toLowerCase()) > -1;
 	            });
@@ -56,13 +70,39 @@ services.factory('EmployeeService', function($q) {
 
     instance.addEmployee = function(employee) {
     	return $q(function(resolve, reject) {
-	        var employees = JSON.parse(window.localStorage.getItem("employees"));
-	        employee.id = employees.length + 1;
+	        var employeeDb = db.employeeDbFromStorage();
+	        	employees = employeeDb.employees;
+	        employee.id = employeeDb.unusedIDs.pop() || employees.length + 1;
 	        employees.push(employee);
-	        window.localStorage.setItem("employees", JSON.stringify(employees));
+	        db.employeeDbToStorage(employees);
 	        resolve(employee);
 	    });
     };
 
+    instance.deleteEmployee = function(employee) {
+    	return $q(function(resolve, reject) {
+	        var	employeeDb = db.employeeDbFromStorage(),
+	        	employees = employeeDb.employees,
+	            l = employees.length,
+	            index = -1;
+
+	        for (var i = 0; i < l; i++) {
+	            if (employees[i].id === employee.id) {
+	                index = i;
+	                break;
+	            }
+	        }
+	        if (i >= 0) {
+	        	employees.splice(index, 1);
+	        }
+	        //update 'DB' object with updated employee list
+	        employeeDb.employees = employees;
+	        //add ID to unused IDs array
+	        employeeDb.unusedIDs.push(employee.id);
+	        db.employeeDbToStorage(employeeDb);
+	        resolve();
+        });
+    };
+
     return instance;
-});
+}]);
