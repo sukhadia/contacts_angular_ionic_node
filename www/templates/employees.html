@@ -5,14 +5,14 @@
       on-refresh="doRefresh()">
     </ion-refresher>
     <ion-list ng-show="employees">
-      <ion-item ng-repeat="employee in employees" class="item-avatar item-icon-right" item-icon-right href="#/app/employee/{{employee.id}}">
+      <ion-item ng-repeat="employee in employees track by employee.id" class="item-avatar item-icon-right" item-icon-right href="#/app/employee/{{employee.id}}">
       	<img ng-src="{{employee.pic}}">
         <h2>{{employee.firstName}} {{employee.lastName}}</h2>
       	<p>{{employee.title}}</p>
         <i class="icon ion-chevron-right"></i>
       </ion-item>
     </ion-list>
-    <h4 ng-show="!employees || !employees.length">
+    <h4 ng-show="ajaxDone && (!employees || !employees.length)">
       No matches found!
     </h4>
   </ion-content>

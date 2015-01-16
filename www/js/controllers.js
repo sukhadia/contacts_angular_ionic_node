@@ -1,14 +1,19 @@
-angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
+angular.module('starter.controllers', ['ionic', 'restful', 'popups', 'native'])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 })
 
 .controller('EmployeesCtrl', ['$scope', '$stateParams', 'EmployeeService', function($scope, $stateParams, service) {
   $scope.doRefresh = function() {
-    service.findByName($stateParams.searchString||'').then(function (employees) {
-      $scope.employees = employees;
-      $scope.$broadcast('scroll.refreshComplete');
-    });
+      service.findByName($stateParams.searchString||'').then(function (employees) {
+        $scope.employees = employees;
+        $scope.$broadcast('scroll.refreshComplete');
+        //To improve UX (you briefly see the "No Matches Found"
+        //...still see it, there is a delay in refreshing the view even after the flag is set).
+        //Try to improve this further at a later point in time.
+        $scope.ajaxDone = true;
+        
+      });
   }
 
   $scope.doRefresh();
@@ -25,8 +30,8 @@ angular.module('starter.controllers', ['ionic', 'services', 'popups', 'native'])
 .controller('EmployeeCtrl', ['$scope', '$state', '$stateParams', '$ionicLoading', '$ionicHistory', 'PopupManager', 'EmployeeService', 'NativeDelegate', function($scope, $state, $stateParams, $ionicLoading, $ionicHistory, popupManager, service, nativeDelegate) {
   $scope.doRefresh = function() {
     service.findById(parseInt($stateParams.employeeId, 10)).then(function (employee) {
-      $scope.employee = employee;
-      $scope.$broadcast('scroll.refreshComplete');
+        $scope.employee = employee;
+        $scope.$broadcast('scroll.refreshComplete');
     });
   }
   $scope.doRefresh();
