@@ -104,7 +104,7 @@ services.factory('EmployeeService', ['EmployeeDb', '$q', function(db, $q) {
 	                break;
 	            }
 	        }
-	        if (i >= 0) {
+	        if (index >= 0) {
 	        	employees.splice(index, 1);
 	        }
 	        //update 'DB' object with updated employee list
