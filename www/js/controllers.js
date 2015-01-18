@@ -29,7 +29,7 @@ angular.module('starter.controllers', ['ionic', 'restful', 'popups', 'native'])
 
 .controller('EmployeeCtrl', ['$scope', '$state', '$stateParams', '$ionicLoading', '$ionicHistory', 'PopupManager', 'EmployeeService', 'NativeDelegate', function($scope, $state, $stateParams, $ionicLoading, $ionicHistory, popupManager, service, nativeDelegate) {
   $scope.doRefresh = function() {
-    service.findById(parseInt($stateParams.employeeId, 10)).then(function (employee) {
+    service.findById($stateParams.employeeId, 10).then(function (employee) {
         $scope.employee = employee;
         $scope.$broadcast('scroll.refreshComplete');
     });
@@ -112,7 +112,7 @@ angular.module('starter.controllers', ['ionic', 'restful', 'popups', 'native'])
     service.deleteEmployee(employee).then(function() {
       popupManager.alert("Deleted Employee").then(function() {
           $ionicHistory.clearHistory();
-          $state.go('app.search');
+          $state.go('app.employees');
       });
     }, function() {
       popupManager.errorAlert("Couldn't add contact.");
@@ -139,17 +139,40 @@ angular.module('starter.controllers', ['ionic', 'restful', 'popups', 'native'])
         };
 
       popupManager.alert("You selected to add: " + angular.toJson(employee)).then(function() {
-        service.addEmployee(employee).then(function(employee) {
-            if (employee) {
-              popupManager.alert("Done adding employee, navigating to their employee page...").then(function() {
-                  $state.go('app.single', {employeeId: employee.id});
-              });
-            }
+        service.addEmployee(employee).then(function(returnedEmployee) {
+          if (returnedEmployee) {
+            $scope.employee = returnedEmployee;
+            popupManager.alert("Done adding employee with id: " + returnedEmployee.id).then(function() {
+                $state.go('app.single', {employeeId: returnedEmployee.id});
+            });
+          }
         }, function() {
           popupManager.errorAlert("Couldn't add contact.");
         });
       });
     });
+    //Following code for better debugging in the desktop browser.
+    // employee = {
+    //     firstName: "Ralph",
+    //     lastName: "Morisson",
+    //     cellPhone: "1234567890",
+    //     officePhone: "0987654321",
+    //     email: "jim.morrison@thedoors.com"
+    //   };
+
+    // popupManager.alert("You selected to add: " + angular.toJson(employee)).then(function() {
+    //   service.addEmployee(employee).then(function(returnedEmployee) {
+    //     if (returnedEmployee) {
+    //       $scope.employee = returnedEmployee;
+    //       popupManager.alert("Done adding employee with id: " + returnedEmployee.id).then(function() {
+    //           $state.go('app.single', {employeeId: returnedEmployee.id});
+    //       });
+    //     }
+    //   }, function() {
+    //     popupManager.errorAlert("Couldn't add contact.");
+    //   });
+    // });
   };
 
+  
 }]);

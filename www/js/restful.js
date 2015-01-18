@@ -7,34 +7,56 @@ services.constant("myConfig", {
 	urlPrefix: "http://localhost:5000"
 });
 services.factory('EmployeeDb', function($q, $http, myConfig) {
-	var instance = {};
+	var instance = {},
+		httpCORS = function(method, urlSuffix, payload) {
+			return $q (function(resolve, reject) {
+				delete $http.defaults.headers.common['X-Requested-With'];
+				$http({
+		            method: method,
+		            url: myConfig.urlPrefix + urlSuffix + ((urlSuffix.indexOf('?')>=0)? '&' : '?') + 'callback=?',
+		            dataType: 'jsonp',
+		            data: payload
+		        }).then(function(results) {
+		        	resolve(results);
+		        });
+			});
+		};
+
 	instance.sync = function() {
 		//TBD
 	};
 
 	instance.findAll = function(searchKey) {
 		return $q (function(resolve, reject) {
-			delete $http.defaults.headers.common['X-Requested-With'];
-			$http({
-	            method: 'GET',
-	            url: myConfig.urlPrefix + '/employees?name=' + searchKey + '&callback=?',
-	            dataType: 'jsonp'
-	        }).then(function(results) {
-	        	resolve(results.data);
-	        });
+			httpCORS('GET', '/employees?name=' + (searchKey && searchKey.toLowerCase() || ''))
+			.then(function(results) { 
+				resolve(results.data); 
+			}, reject);
 		});
 	};
 
 	instance.findById = function(id) {
 		return $q (function(resolve, reject) {
-			delete $http.defaults.headers.common['X-Requested-With'];
-			$http({
-	            method: 'GET',
-	            url: myConfig.urlPrefix + '/employees/' + id + '?callback=?',
-	            dataType: 'jsonp'
-	        }).then(function(results){
-	        	resolve(results.data);
-	        });
+			httpCORS('GET', '/employees/' + id)
+			.then(function(results) { 
+				resolve(results.data); 
+			}, reject);
+		});
+	};
+
+	instance.add = function(employee) {
+		return $q (function(resolve, reject) {
+			httpCORS('POST', '/employees/', employee)
+			.then(function(results) { 
+				resolve(results.data.employee); 
+			}, reject);
+		});
+	};
+
+	instance.delete = function(employee) {
+		return $q (function(resolve, reject) {
+			httpCORS('DELETE', '/employees/' + employee._id)
+			.then(resolve, reject);
 		});
 	};
 
@@ -60,37 +82,13 @@ services.factory('EmployeeService', ['EmployeeDb', '$q', function(db, $q) {
 
     instance.addEmployee = function(employee) {
     	return $q(function(resolve, reject) {
-	        var employeeDb = db.employeeDbFromStorage();
-	        	employees = employeeDb.employees;
-	        employee.id = employeeDb.maxId + 1;
-	        employees.push(employee);
-	        db.employeeDbToStorage(employees);
-	        resolve(employee);
+	        db.add(employee).then(resolve, reject);
 	    });
     };
 
     instance.deleteEmployee = function(employee) {
     	return $q(function(resolve, reject) {
-	        var	employeeDb = db.employeeDbFromStorage(),
-	        	employees = employeeDb.employees,
-	            l = employees.length,
-	            index = -1;
-
-	        for (var i = 0; i < l; i++) {
-	            if (employees[i].id === employee.id) {
-	                index = i;
-	                break;
-	            }
-	        }
-	        if (i >= 0) {
-	        	employees.splice(index, 1);
-	        }
-	        //update 'DB' object with updated employee list
-	        employeeDb.employees = employees;
-	        //add ID to unused IDs array
-	        employeeDb.unusedIDs.push(employee.id);
-	        db.employeeDbToStorage(employeeDb);
-	        resolve();
+	        db.delete(employee).then(resolve, reject);
         });
     };
 
