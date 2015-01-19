@@ -172,7 +172,22 @@ angular.module('starter.controllers', ['ionic', 'restful', 'popups', 'native'])
     //     popupManager.errorAlert("Couldn't add contact.");
     //   });
     // });
-  };
+  }
 
   
+}])
+
+.controller('SyncCtrl', ['$scope', '$ionicLoading', 'EmployeeService', function($scope, $ionicLoading, service) {
+  $scope.status = 'loading';
+  $ionicLoading.show({
+    template: 'Loading...'
+  });
+  service.sync().then(function() {
+    $scope.status = 'success';
+    $ionicLoading.hide();
+  }, function() { 
+    $scope.status = 'error'; 
+    $ionicLoading.hide();
+  });
+
 }]);

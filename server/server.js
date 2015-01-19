@@ -20,6 +20,7 @@ app.all('*', function(req, res, next) {
     return next();
 });
 
+app.get('/sync', employees.sync);
 app.get('/employees', employees.findAll);
 app.get('/employees/:id', employees.findById);
 app.post('/employees', employees.addEmployee );

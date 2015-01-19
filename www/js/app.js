@@ -60,6 +60,16 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   })
 
+  .state('app.sync', {
+    url: "/sync",
+    views: {
+      'menuContent': {
+        templateUrl: "templates/sync.html",
+        controller: 'SyncCtrl'
+      }
+    }
+  })
+
   .state('app.addEmployee', {
     url: "/addEmployee",
     views: {

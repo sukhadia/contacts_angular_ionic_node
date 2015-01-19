@@ -16,25 +16,28 @@ var localDB = new PouchDB('localDB'),
 	    	}));
 	    });
 	},
-	retryReplication = function () {
+	retryReplication = function (res) {
 	  	var timeout = 5000;
 		var backoff = 2;
-		localDB.sync(remoteDB, {live: true}).on('change', function (change) {
+		localDB.sync(remoteDB).on('complete', function(){
+			console.log('Sync completed.');
+			res.send({status: 'Sync completed.'});
+		}).on('change', function (change) {
 			console.log('Sync change detected...');
-		    timeout = 5000; // reset
+			// res.send({status: 'Sync change detected...'});
 		}).on('error', function (err) {
-			console.log('There was an error during sync: ' + err);
-			setTimeout(function () {
-		    	timeout *= backoff;
-		    	retryReplication();
-		    }, timeout);
+			res.send({status: 'There was an error during sync: ' + err});
+			// setTimeout(function () {
+		 //    	timeout *= backoff;
+		 //    	retryReplication();
+		 //    }, timeout);
 		});
 	};
 
 
 PouchDB.debug.enable('*');
 
-retryReplication();
+//retryReplication();
 
 exports.findAll = function (req, res, next) {
     var name = req.query.name;
@@ -89,4 +92,8 @@ exports.deleteEmployee = function (req, res, next) {
 	}).catch(function(err) {
 		res.send(err);
 	});
+};
+
+exports.sync = function (req, res) {
+	retryReplication(res);
 };
