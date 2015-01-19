@@ -17,7 +17,7 @@ services.factory('EmployeeDb', function($q, $http, myConfig) {
 		            dataType: 'jsonp',
 		            data: payload
 		        }).then(function(results) {
-		        	resolve(results);
+		        	resolve(results.data);
 		        });
 			});
 		};
@@ -29,8 +29,8 @@ services.factory('EmployeeDb', function($q, $http, myConfig) {
 	instance.findAll = function(searchKey) {
 		return $q (function(resolve, reject) {
 			httpCORS('GET', '/employees?name=' + (searchKey && searchKey.toLowerCase() || ''))
-			.then(function(results) { 
-				resolve(results.data); 
+			.then(function(data) { 
+				resolve(data); 
 			}, reject);
 		});
 	};
@@ -38,8 +38,8 @@ services.factory('EmployeeDb', function($q, $http, myConfig) {
 	instance.findById = function(id) {
 		return $q (function(resolve, reject) {
 			httpCORS('GET', '/employees/' + id)
-			.then(function(results) { 
-				resolve(results.data); 
+			.then(function(data) { 
+				resolve(data); 
 			}, reject);
 		});
 	};
@@ -47,8 +47,8 @@ services.factory('EmployeeDb', function($q, $http, myConfig) {
 	instance.add = function(employee) {
 		return $q (function(resolve, reject) {
 			httpCORS('POST', '/employees/', employee)
-			.then(function(results) { 
-				resolve(results.data.employee); 
+			.then(function(data) { 
+				resolve(data.employee); 
 			}, reject);
 		});
 	};
