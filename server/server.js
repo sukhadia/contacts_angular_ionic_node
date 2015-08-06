@@ -3,12 +3,12 @@ var express = require('express'),
     http = require('http'),
     bodyParser     = require('body-parser'),
     methodOverride = require('method-override'),
-    employees = require('./routes/pouchdb'),
+    employees = require('./routes/employees'),
     app = express();
 
 //Configure app (express instance)
 app.set('port', process.env.PORT || 5000);
-app.use(bodyParser()),// pull information from html in POST
+app.use(bodyParser());// pull information from html in POST
 app.use(methodOverride());      // simulate DELETE and PUT
 app.use(express.static(path.resolve(__dirname, '../workshop_angular_ionic_contact_picker/www')));
 

@@ -20,11 +20,15 @@ employees.maxId = function() {
     var maxId = -1;
     employees.forEach(function(employee) {
         maxId = (employee.id > maxId)? employee.id : maxId;
-    })
+    });
     return maxId;
 };
 
-exports.findAll = function (req, res, next) {
+exports.sync = function (req, res) {
+    res.send({status: 'Sync completed.'});
+};
+
+exports.findAll = function (req, res) {
     var name = req.query.name;
     console.log('name: ' + name);
     if (name) {
@@ -38,7 +42,7 @@ exports.findAll = function (req, res, next) {
     }
 };
 
-exports.findById = function (req, res, next) {
+exports.findById = function (req, res) {
     var id = parseInt(req.params.id, 10),
         l = employees.length,
         employee = {};
@@ -51,7 +55,7 @@ exports.findById = function (req, res, next) {
     res.send(employee);
 };
 
-exports.addEmployee = function (req, res, next) {
+exports.addEmployee = function (req, res) {
     var employee = req.body,
         employeeJson = JSON.stringify(employee);
     employee.id = employee.id || (employees.maxId() + 1);
@@ -60,7 +64,7 @@ exports.addEmployee = function (req, res, next) {
     res.send(status("Successfully added employee with ID: " + employee.id));
 };
 
-exports.deleteEmployee = function (req, res, next) {
+exports.deleteEmployee = function (req, res) {
     var id = parseInt(req.params.id, 10),
         l = employees.length,
         index = -1,

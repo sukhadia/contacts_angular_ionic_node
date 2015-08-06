@@ -20,8 +20,11 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider
+.config(function($stateProvider, $urlRouterProvider, $compileProvider) {
+      //following boilerplate from: http://stackoverflow.com/questions/15606751/angular-changes-urls-to-unsafe-in-extension-page
+      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|tel|mailto|chrome-extension|sms):/);
+
+      $stateProvider
 
   .state('app', {
     url: "/app",
