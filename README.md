@@ -8,8 +8,8 @@ Setup/Install Steps:
 3. npm install -g cordova ionic
 4. npm install
 5. In a separate console:
-    6.1 cd employee_contacts_angular_ionic/server
-    6.2 node server.js
+5.1. cd employee_contacts_angular_ionic/server
+5.2. node server.js
 6. ionic serve
 7. Go to "http://localhost:8000" to see the app and step through the front-end code using Chrome Dev Tools, Firebug, etc.
 
