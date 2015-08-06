@@ -1,4 +1,4 @@
-# employee_contacts_angular_ionic
+# contacts_angular_ionic_node
 A sample project demonstrating basic capabilities of Cordova/Ionic with AngularJS frameworks.
 
 Setup/Install Steps:
